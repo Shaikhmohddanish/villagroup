@@ -174,7 +174,7 @@
         </button>
     </div>
 
-    <div class="py-5 bg-light" id="about">
+    <div class="bg-light my-2" id="about">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-12">
@@ -2011,25 +2011,14 @@
 <script>
 (function() {
   var popupTimeout = null;
-  var popupInterval = 10000; // 10 seconds
   var initialDelay = 1000; // 1 second
 
   function showPopup() {
     $('#modal-form').modal('show');
   }
 
-  function schedulePopup(delay) {
-    if (popupTimeout) clearTimeout(popupTimeout);
-    popupTimeout = setTimeout(showPopup, delay);
-  }
-
   // Show popup after 1 second on first visit
-  schedulePopup(initialDelay);
-
-  // When popup is closed, schedule next popup after 10 seconds
-  $('#modal-form').on('hidden.bs.modal', function() {
-    schedulePopup(popupInterval);
-  });
+  popupTimeout = setTimeout(showPopup, initialDelay);
 
   // When popup is shown, clear any scheduled popup
   $('#modal-form').on('shown.bs.modal', function() {
