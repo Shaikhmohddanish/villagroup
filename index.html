@@ -2112,7 +2112,7 @@ function submitToCratio(formElem, event) {
   $form.find('button[type="submit"]').prop('disabled', true);
 
   $.ajax({
-    url: "https://apps.cratiocrm.com/Customize/Webhooks/webhook.php?id=484610",
+    url: "/api/cratio-proxy",  // <-- NEW: your Vercel serverless function
     type: "POST",
     data: JSON.stringify(buildCratioPayload(formData)),
     contentType: "application/json",
@@ -2134,7 +2134,8 @@ function submitToCratio(formElem, event) {
       $form.find('button[type="submit"]').prop('disabled', false);
       alert("There was a problem submitting the form. Please try again.");
     }
-  });
+});
+
 
   return false;
 }
