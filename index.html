@@ -1549,7 +1549,7 @@
     <div class="text-center mb-4">
       <img src="images/Villa-Group-Logo.png" alt="Villa Group Logo" style="max-height: 60px;">
     </div>
-    <div class="address-info text-center"> <!-- changed text-center to text-start -->
+    <div class="address-info text-start"> <!-- changed text-center to text-start -->
       <h4 class="mb-3" style="color:#5A3E36;font-weight:700;">CONTACT DETAILS</h4>
       <p class="mb-2">
         <img src="images/loc.svg" style="width:20px;vertical-align:middle;margin-right:8px;">
@@ -2084,14 +2084,14 @@ function hideLoader() {
 // Prepare payload for Cratio CRM
 function buildCratioPayload(formData) {
   return {
-    leadid: "JDF99CB5961B40", // Provided in documentation
-    company: "Uptown Spaces Pvt Ltd",
+    leadid: "JDF99CB5961B40",
+    company: "Uptown Spaces Pvt Ltd", // Or "Greaves Cotton Ltd" if needed
     contact: formData.fname || "",
     mobile: "+91-" + (formData.mobile || ""),
-    phone: formData.phone || "",           // optional field
+    phone: formData.phone || "",
     email: formData.email || "",
     date: new Date().toISOString().split("T")[0],
-    category: formData.category || "",     // optional field, empty by default
+    category: formData.category || "",
     area: formData.area || "",
     city: formData.city || "",
     brancharea: formData.brancharea || "",
@@ -2102,65 +2102,64 @@ function buildCratioPayload(formData) {
   };
 }
 
-
+// Main form submission handler
 function submitToCratio(formElem, event) {
   event.preventDefault();
 
   var $form = $(formElem);
-  var fname = $form.find('[name="fname"]').val().trim();
-  var email = $form.find('[name="email"]').val().trim();
-  var mobile = $form.find('[name="mobile"]').val().trim();
-  // Add more fields if required, example: area, city, category etc.
+  // Serialize all fields to a simple object
+  var formData = {};
+  $form.serializeArray().forEach(function(item) {
+    formData[item.name] = item.value.trim();
+  });
 
-  // Validation
-  if (fname === "" || mobile === "") {
+  // Debug: Check what data you are sending
+  console.log("Form Data:", formData);
+
+  // Validation: Required fields
+  if (!formData.fname || !formData.mobile) {
     alert("Please fill in Name and Mobile fields.");
     return false;
   }
-  if (!/^\d{10}$/.test(mobile)) {
+  if (!/^\d{10}$/.test(formData.mobile)) {
     alert("Please enter a valid 10-digit mobile number.");
     return false;
   }
 
-  // Prepare data for payload
-  var formData = {
-    fname: fname,
-    email: email,
-    mobile: mobile
-    // Add more as needed
-  };
-
   showLoader();
   $form.find('button[type="submit"]').prop('disabled', true);
 
+  // Prepare final payload for the API
+  var payload = buildCratioPayload(formData);
+  console.log("Payload sent to API:", payload);
+
   $.ajax({
-    url: "/api/cratio-proxy",  // <-- NEW: your Vercel serverless function
+    url: "/api/cratio-proxy",  // Your Vercel/Serverless endpoint
     type: "POST",
-    data: JSON.stringify(buildCratioPayload(formData)),
+    data: JSON.stringify(payload),
     contentType: "application/json",
-    
+
     success: function(response) {
-        hideLoader();
-        $(formElem).trigger("reset");
-        $('#modal-form').modal('hide'); // Hide your enquiry modal if it's still open
-
-        var thankyouModal = new bootstrap.Modal(document.getElementById('thankyouModal'));
-        thankyouModal.show();
-        setTimeout(function() {
-            thankyouModal.hide();
-        }, 5000);
+      hideLoader();
+      $form.trigger("reset");
+      $('#modal-form').modal('hide');
+      var thankyouModal = new bootstrap.Modal(document.getElementById('thankyouModal'));
+      thankyouModal.show();
+      setTimeout(function() {
+        thankyouModal.hide();
+      }, 5000);
     },
-
     error: function(xhr) {
       hideLoader();
       $form.find('button[type="submit"]').prop('disabled', false);
       alert("There was a problem submitting the form. Please try again.");
     }
-});
-
+  });
 
   return false;
 }
+
+// Attach to forms on ready
 $(document).ready(function(){
   $('#contact-form').submit(function(e){
     submitToCratio(this, e);
@@ -2170,6 +2169,7 @@ $(document).ready(function(){
   });
 });
 </script>
+
 
 
 </body>
