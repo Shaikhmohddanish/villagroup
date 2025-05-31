@@ -192,23 +192,23 @@
                         <a class="nav-link owl-menu" href="javascript:void(0);">HOME</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link owl-menu" href="index.html#about">OVERVIEW</a>
+                        <a class="nav-link owl-menu" href="#about">OVERVIEW</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link owl-menu" href="index.html#conf">CONFIGURATION</a>
+                        <a class="nav-link owl-menu" href="#conf">CONFIGURATION</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link owl-menu" href="index.html#ame">AMENITIES</a>
+                        <a class="nav-link owl-menu" href="#ame">AMENITIES</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link owl-menu" href="index.html#loc">LOCATION</a>
+                        <a class="nav-link owl-menu" href="#loc">LOCATION</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link owl-menu" href="index.html#gal">GALLERY</a>
+                        <a class="nav-link owl-menu" href="#gal">GALLERY</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link owl-menu" href="index.html#con">CONTACT US</a>
+                        <a class="nav-link owl-menu" href="#con">CONTACT US</a>
                     </li>
 
                     <li> <a style="text-decoration: none;" href="tel:+917304577175" data-event-category="header" class="nav-phone" data-event-action="click" data-event-name="tact">
@@ -2077,6 +2077,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     });
+  });
+});
+
+document.querySelectorAll('.owl-menu').forEach(function(link) {
+  link.addEventListener('click', function(e) {
+    var target = this.getAttribute('href');
+    if (target && target.startsWith('#')) {
+      var el = document.querySelector(target);
+      if (el) {
+        e.preventDefault();
+        var navbar = document.querySelector('.my_nav_bar');
+        var yOffset = navbar ? navbar.offsetHeight : 70;
+        var y = el.getBoundingClientRect().top + window.pageYOffset - yOffset;
+        window.scrollTo({top: y, behavior: 'smooth'});
+      }
+    }
   });
 });
 
