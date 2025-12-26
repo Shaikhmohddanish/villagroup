@@ -289,9 +289,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <p>
                     Villa Group is a leading real estate and lifestyle developer. Villa Group has successfully developed and delivered more than 25+ Projects & 800+ Happy Homes across a variety of prime locations. At Villa Group, what we build today will achieve the promise of a better tomorrow. Adopting a proactive, transparent and construction driven approach, Villa Group is committed to meeting and exceeding expectations, offering value for money and ensuring quality. Bringing Trust to Realty.
                 </p>
-                <p class="fw-bold">
-                    LIVING | LEARNING | SPORTS & FITNESS | HERITAGE & ARTS | SPIRITUAL WELLNESS | LEISURE & ENTERTAINMENT | MEDICAL CARE | INFRASTRUCTURE & ACCESSIBILITY
-                </p>
             </div>
         </div>
     </div>
@@ -2094,20 +2091,24 @@ document.querySelectorAll('.owl-menu').forEach(function(link) {
 
 <script>
 (function() {
-  var popupTimeout = null;
-  var initialDelay = 1000; // 1 second
+    var popupIntervalMs = 15000; // 15 seconds
+    var popupIntervalId = null;
 
-  function showPopup() {
-    $('#modal-form').modal('show');
-  }
+    function showPopupIfHidden() {
+        if (!$('#modal-form').hasClass('show')) {
+            $('#modal-form').modal('show');
+        }
+    }
 
-  // Show popup after 1 second on first visit
-  popupTimeout = setTimeout(showPopup, initialDelay);
+    // Open the popup every 15 seconds (skips if already visible)
+    popupIntervalId = setInterval(showPopupIfHidden, popupIntervalMs);
 
-  // When popup is shown, clear any scheduled popup
-  $('#modal-form').on('shown.bs.modal', function() {
-    if (popupTimeout) clearTimeout(popupTimeout);
-  });
+    // Safety: restart the interval if it ever gets cleared
+    $('#modal-form').on('hidden.bs.modal', function() {
+        if (!popupIntervalId) {
+            popupIntervalId = setInterval(showPopupIfHidden, popupIntervalMs);
+        }
+    });
 })();
 </script>
 
