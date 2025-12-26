@@ -311,58 +311,5 @@
         },
       },
     });
-
-    // Sell.do API push
-    const SELLDO_API = "https://app.sell.do/api/leads/create";
-    const SELLDO_API_KEY = "e671547fdcfa16ba3f4dc662863b07e2";
-
-    const getParam = (key) => new URLSearchParams(window.location.search).get(key) || "";
-
-    contact_form.on("submit", function (e) {
-      if (!contact_form.valid()) {
-        return;
-      }
-      e.preventDefault();
-
-      const name = $("#contact-fname").val().trim();
-      const email = $("#contact-email").val().trim();
-      const phone = $("#contact-mobile").val().trim();
-      const message = $("#price-enqproject").val() || "";
-      const srd = getParam("srd") || "";
-
-      const payload = {
-        sell_do: {
-          analytics: {
-            utm_content: getParam("utm_content"),
-            utm_term: getParam("utm_term"),
-            utm_source: getParam("utm_source"),
-            utm_medium: getParam("utm_medium"),
-            utm_campaign: getParam("utm_campaign"),
-          },
-          campaign: { srd },
-          form: {
-            requirement: { property_type: "flat" },
-            lead: { name, phone, email },
-            note: { content: message },
-          },
-        },
-        api_key: SELLDO_API_KEY,
-      };
-
-      $.ajax({
-        url: SELLDO_API,
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(payload),
-        success: function () {
-          alert("Thank you! We have received your details.");
-          contact_form.trigger("reset");
-        },
-        error: function (xhr) {
-          console.error("Sell.do push failed", xhr.responseText || xhr.statusText);
-          alert("Unable to submit right now. Please try again.");
-        },
-      });
-    });
   }
 })(jQuery);

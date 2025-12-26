@@ -175,13 +175,13 @@
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-WXS5R2Z8');</script>
+})(window,document,'script','dataLayer','GTM-KR3HZWXX');</script>
 <!-- End Google Tag Manager -->
 </head>
 
 <body>
     <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WXS5R2Z8"
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KR3HZWXX"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
@@ -2091,23 +2091,46 @@ document.querySelectorAll('.owl-menu').forEach(function(link) {
 
 <script>
 (function() {
-    var popupIntervalMs = 15000; // 15 seconds
-    var popupIntervalId = null;
+    var initialDelayMs = 1000; // first visit prompt after 1s
+    var repeatDelayMs = 10000; // 10 seconds between prompts after close
+    var popupTimerId = null;
+    var hasSubmitted = false;
 
-    function showPopupIfHidden() {
-        if (!$('#modal-form').hasClass('show')) {
-            $('#modal-form').modal('show');
+    function clearPopupTimer() {
+        if (popupTimerId) {
+            clearTimeout(popupTimerId);
+            popupTimerId = null;
         }
     }
 
-    // Open the popup every 15 seconds (skips if already visible)
-    popupIntervalId = setInterval(showPopupIfHidden, popupIntervalMs);
+    function schedulePopup(delayMs) {
+        clearPopupTimer();
+        popupTimerId = setTimeout(function() {
+            if (!hasSubmitted && !$('#modal-form').hasClass('show')) {
+                $('#modal-form').modal('show');
+            }
+        }, delayMs);
+    }
 
-    // Safety: restart the interval if it ever gets cleared
+    // Initial prompt on first visit
+    schedulePopup(initialDelayMs);
+
+    // Stop timer while modal is open
+    $('#modal-form').on('shown.bs.modal', function() {
+        clearPopupTimer();
+    });
+
+    // After user closes without submitting, restart 10s countdown
     $('#modal-form').on('hidden.bs.modal', function() {
-        if (!popupIntervalId) {
-            popupIntervalId = setInterval(showPopupIfHidden, popupIntervalMs);
+        if (!hasSubmitted) {
+            schedulePopup(repeatDelayMs);
         }
+    });
+
+    // Once any tracked form submits, stop further auto popups
+    $('#main-form, #contact-form').on('submit', function() {
+        hasSubmitted = true;
+        clearPopupTimer();
     });
 })();
 </script>
@@ -2123,22 +2146,44 @@ function hideLoader() {
 // Prepare payload for Cratio CRM
 function buildCratioPayload(formData) {
   return {
-    leadid: "JDF99CB5961B40",
-    company: "Uptown Spaces Pvt Ltd", // Or "Greaves Cotton Ltd" if needed
-    contact: formData.fname || "",
-    mobile: "+91-" + (formData.mobile || ""),
-    phone: formData.phone || "",
-    email: formData.email || "",
-    date: new Date().toISOString().split("T")[0],
-    category: formData.category || "",
-    area: formData.area || "",
-    city: formData.city || "",
-    brancharea: formData.brancharea || "",
-    pincode: formData.pincode || "0",
-    time: new Date().toTimeString().substr(0,8),
-    branchpin: formData.branchpin || "",
-    parentid: formData.parentid || ""
+        contact: formData.fname || "",
+        mobile: "+91-" + (formData.mobile || ""),
+        email: formData.email || "",
+        message: formData.message || formData.note || "",
+        source: formData.source || "",
+        date: new Date().toISOString().split("T")[0],
+        time: new Date().toTimeString().substr(0,8)
   };
+}
+
+function getParam(key) {
+    return new URLSearchParams(window.location.search).get(key) || "";
+}
+
+function pushToSellDo(formData) {
+    var sellDoPayload = {
+        name: formData.fname || "",
+        phone: formData.mobile ? "+91" + formData.mobile : "",
+        email: formData.email || "",
+        message: formData.message || formData.note || "",
+        srd: formData.srd || getParam("srd"),
+        utm_content: getParam("utm_content"),
+        utm_term: getParam("utm_term"),
+        utm_source: getParam("utm_source"),
+        utm_medium: getParam("utm_medium"),
+        utm_campaign: getParam("utm_campaign"),
+    };
+
+    return fetch("/api/selldo-proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sellDoPayload),
+    }).then(function(res) {
+        if (!res.ok) {
+            throw new Error("Sell.do submission failed");
+        }
+        return res.json().catch(function() { return {}; });
+    });
 }
 
 // Main form submission handler
@@ -2151,9 +2196,6 @@ function submitToCratio(formElem, event) {
   $form.serializeArray().forEach(function(item) {
     formData[item.name] = item.value.trim();
   });
-
-  // Debug: Check what data you are sending
-  console.log("Form Data:", formData);
 
   // Validation: Required fields
   if (!formData.fname || !formData.mobile) {
@@ -2168,32 +2210,31 @@ function submitToCratio(formElem, event) {
   showLoader();
   $form.find('button[type="submit"]').prop('disabled', true);
 
-  // Prepare final payload for the API
-  var payload = buildCratioPayload(formData);
-  console.log("Payload sent to API:", payload);
+    // Prepare final payload for the API
+    var payload = buildCratioPayload(formData);
 
-  $.ajax({
-    url: "/api/cratio-proxy",  // Your Vercel/Serverless endpoint
-    type: "POST",
-    data: JSON.stringify(payload),
-    contentType: "application/json",
+    var cratioRequest = $.ajax({
+        url: "/api/cratio-proxy",
+        type: "POST",
+        data: JSON.stringify(payload),
+        contentType: "application/json",
+    });
 
-    success: function(response) {
-      hideLoader();
-      $form.trigger("reset");
-      $('#modal-form').modal('hide');
-      var thankyouModal = new bootstrap.Modal(document.getElementById('thankyouModal'));
-      thankyouModal.show();
-      setTimeout(function() {
-        thankyouModal.hide();
-      }, 5000);
-    },
-    error: function(xhr) {
-      hideLoader();
-      $form.find('button[type="submit"]').prop('disabled', false);
-      alert("There was a problem submitting the form. Please try again.");
-    }
-  });
+    Promise.all([pushToSellDo(formData), cratioRequest]).then(function() {
+        hideLoader();
+        $form.trigger("reset");
+        $('#modal-form').modal('hide');
+        var thankyouModal = new bootstrap.Modal(document.getElementById('thankyouModal'));
+        thankyouModal.show();
+        setTimeout(function() {
+            thankyouModal.hide();
+        }, 5000);
+    }).catch(function(err) {
+        console.error(err);
+        hideLoader();
+        $form.find('button[type="submit"]').prop('disabled', false);
+        alert("There was a problem submitting the form. Please try again.");
+    });
 
   return false;
 }
