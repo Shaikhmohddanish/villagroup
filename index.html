@@ -2222,13 +2222,7 @@ function submitToCratio(formElem, event) {
 
     Promise.all([pushToSellDo(formData), cratioRequest]).then(function() {
         hideLoader();
-        $form.trigger("reset");
-        $('#modal-form').modal('hide');
-        var thankyouModal = new bootstrap.Modal(document.getElementById('thankyouModal'));
-        thankyouModal.show();
-        setTimeout(function() {
-            thankyouModal.hide();
-        }, 5000);
+        window.location.href = "thank-you.html";
     }).catch(function(err) {
         console.error(err);
         hideLoader();
