@@ -1,6 +1,3 @@
-// /api/selldo-proxy.js
-// Serverless proxy to Sell.do
-
 const SELLDO_ENDPOINT = "https://app.sell.do/api/leads/create";
 const SELLDO_API_KEY = "763df41feda17d2d393a0cc4dd367ba9"; // Hardcoded per user request
 
