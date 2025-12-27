@@ -2160,17 +2160,32 @@ function getParam(key) {
 }
 
 function pushToSellDo(formData) {
+    var phoneValue = formData.mobile || "";
+    var phoneWithCode = phoneValue.startsWith("+") ? phoneValue : "+91" + phoneValue;
+    var message = formData.message || formData.note || "";
+    var srd = formData.srd || getParam("srd") || "";
+
     var sellDoPayload = {
-        name: formData.fname || "",
-        phone: formData.mobile ? "+91" + formData.mobile : "",
-        email: formData.email || "",
-        message: formData.message || formData.note || "",
-        srd: formData.srd || getParam("srd"),
-        utm_content: getParam("utm_content"),
-        utm_term: getParam("utm_term"),
-        utm_source: getParam("utm_source"),
-        utm_medium: getParam("utm_medium"),
-        utm_campaign: getParam("utm_campaign"),
+        sell_do: {
+            analytics: {
+                utm_content: getParam("utm_content"),
+                utm_term: getParam("utm_term"),
+                utm_source: getParam("utm_source"),
+                utm_medium: getParam("utm_medium"),
+                utm_campaign: getParam("utm_campaign"),
+            },
+            campaign: { srd: srd },
+            form: {
+                requirement: { property_type: "flat" },
+                custom: {},
+                note: { content: message },
+                lead: {
+                    name: formData.fname || "",
+                    phone: phoneWithCode,
+                    email: formData.email || "",
+                },
+            },
+        },
     };
 
     return fetch("/api/selldo-proxy", {
@@ -2178,10 +2193,12 @@ function pushToSellDo(formData) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sellDoPayload),
     }).then(function(res) {
-        if (!res.ok) {
-            throw new Error("Sell.do submission failed");
-        }
-        return res.json().catch(function() { return {}; });
+        return res.text().then(function(text) {
+            if (!res.ok) {
+                throw new Error("Sell.do error " + res.status + ": " + text);
+            }
+            try { return JSON.parse(text); } catch (e) { return text; }
+        });
     });
 }
 
@@ -2212,14 +2229,7 @@ function submitToCratio(formElem, event) {
     // Prepare final payload for the API
     var payload = buildPayload(formData);
 
-    var cratioRequest = $.ajax({
-        url: "/api/cratio-proxy",
-        type: "POST",
-        data: JSON.stringify(payload),
-        contentType: "application/json",
-    });
-
-    Promise.all([pushToSellDo(formData), cratioRequest]).then(function() {
+    pushToSellDo(formData).then(function() {
         hideLoader();
         window.location.href = "thank-you.html";
     }).catch(function(err) {

@@ -1,5 +1,5 @@
-const SELLDO_ENDPOINT = "https://app.sell.do/api/leads/create";
-const SELLDO_API_KEY = "763df41feda17d2d393a0cc4dd367ba9"; // Hardcoded per user request
+const SELLDO_ENDPOINT = "https://app.sell.do/api/leads/create.json";
+const SELLDO_API_KEY = "763df41feda17d2d393a0cc4dd367ba9";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
