@@ -8,43 +8,60 @@ export default async function handler(req, res) {
   }
 
   try {
-    const {
-      name = "",
-      phone = "",
-      email = "",
-      message = "",
-      srd = "",
-      utm_content = "",
-      utm_term = "",
-      utm_source = "",
-      utm_medium = "",
-      utm_campaign = "",
-      property_type = "flat",
-    } = req.body || {};
+    const body = req.body || {};
 
-    if (!name || !phone || !email) {
-      res.status(400).json({ error: "Missing required fields: name, phone, email" });
-      return;
+    // If caller already sent the full sell_do structure, just append API key.
+    // Otherwise, build the expected structure from flat fields.
+    let payload;
+    if (body.sell_do) {
+      payload = {
+        ...body,
+        api_key: SELLDO_API_KEY,
+      };
+      const lead = body.sell_do?.form?.lead || {};
+      if (!lead.name || !lead.phone || !lead.email) {
+        res.status(400).json({ error: "Missing required fields: name, phone, email" });
+        return;
+      }
+    } else {
+      const {
+        name = "",
+        phone = "",
+        email = "",
+        message = "",
+        srd = "",
+        utm_content = "",
+        utm_term = "",
+        utm_source = "",
+        utm_medium = "",
+        utm_campaign = "",
+        property_type = "flat",
+      } = body;
+
+      if (!name || !phone || !email) {
+        res.status(400).json({ error: "Missing required fields: name, phone, email" });
+        return;
+      }
+
+      payload = {
+        sell_do: {
+          analytics: {
+            utm_content,
+            utm_term,
+            utm_source,
+            utm_medium,
+            utm_campaign,
+          },
+          campaign: { srd },
+          form: {
+            requirement: { property_type },
+            lead: { name, phone, email },
+            note: { content: message },
+          },
+        },
+        api_key: SELLDO_API_KEY,
+      };
     }
-
-    const payload = {
-      sell_do: {
-        analytics: {
-          utm_content,
-          utm_term,
-          utm_source,
-          utm_medium,
-          utm_campaign,
-        },
-        campaign: { srd },
-        form: {
-          requirement: { property_type },
-          lead: { name, phone, email },
-          note: { content: message },
-        },
-      },
-      api_key: SELLDO_API_KEY,
-    };
 
     const sellDoResponse = await fetch(SELLDO_ENDPOINT, {
       method: "POST",
