@@ -2143,8 +2143,7 @@ function hideLoader() {
   $('#customLoader').fadeOut(200);
 }
 
-// Prepare payload for Cratio CRM
-function buildCratioPayload(formData) {
+function buildPayload(formData) {
   return {
         contact: formData.fname || "",
         mobile: "+91-" + (formData.mobile || ""),
@@ -2211,7 +2210,7 @@ function submitToCratio(formElem, event) {
   $form.find('button[type="submit"]').prop('disabled', true);
 
     // Prepare final payload for the API
-    var payload = buildCratioPayload(formData);
+    var payload = buildPayload(formData);
 
     var cratioRequest = $.ajax({
         url: "/api/cratio-proxy",
