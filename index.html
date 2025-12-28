@@ -2227,14 +2227,73 @@ function submitForm(formElem, event) {
             window.history.pushState({}, 'Thank You', 'thank-you.html');
         }
         
-        // Show thank you modal
-        $('#thankyouModal').modal('show');
-        
-        // Reset form after showing success message
-        setTimeout(function() {
-            $form[0].reset();
-            $form.find('button[type="submit"]').prop('disabled', false);
-        }, 500);
+        // Replace entire page body with thank you content
+        $('body').html(`
+            <style>
+                body {
+                  background: #f5f1eb;
+                  color: #3b2c28;
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .thankyou-card {
+                  max-width: 720px;
+                  width: 100%;
+                  background: #fff;
+                  border-radius: 16px;
+                  padding: 48px 40px;
+                  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+                  text-align: center;
+                }
+                .thankyou-card img {
+                  max-height: 90px;
+                  width: auto;
+                  margin-bottom: 24px;
+                }
+                .thankyou-card h1 {
+                  font-size: 34px;
+                  font-weight: 700;
+                  margin-bottom: 12px;
+                  letter-spacing: 0.5px;
+                }
+                .thankyou-card p {
+                  font-size: 17px;
+                  margin-bottom: 28px;
+                  color: #5f4c46;
+                }
+                .btn-primary {
+                  background-color: #d4a016;
+                  border-color: #d4a016;
+                  font-weight: 700;
+                  letter-spacing: 0.4px;
+                  padding: 12px 24px;
+                  text-decoration: none;
+                  display: inline-block;
+                  border-radius: 6px;
+                  color: white;
+                }
+                .btn-outline {
+                  color: #3b2c28;
+                  border: 1px solid #c9b6a8;
+                  font-weight: 600;
+                  padding: 12px 24px;
+                  text-decoration: none;
+                  display: inline-block;
+                  border-radius: 6px;
+                }
+            </style>
+            <div class="thankyou-card">
+                <img src="images/Villa-Group-Logo.png" alt="Villa Group Logo">
+                <h1>Thank You!</h1>
+                <p>Your enquiry has been received. Our team will connect with you shortly.</p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a class="btn btn-primary px-4" href="tel:+917304577175">Call Us</a>
+                    <a class="btn btn-outline px-4" href="/">Back to Home</a>
+                </div>
+            </div>
+        `);
         
     }).catch(function(err) {
         console.error("Form submission error:", err);
