@@ -1871,8 +1871,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script src="js/custome.js"></script>
     <script src="js/counterFunction.js"></script>
 
-    <script src="js/url-tracking.js"></script>
-
     <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/vendors/jquery.mousewheel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.4.0/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/ScrollTrigger.min.js"></script>
@@ -2143,23 +2141,11 @@ function hideLoader() {
   $('#customLoader').fadeOut(200);
 }
 
-function buildPayload(formData) {
-  return {
-        contact: formData.fname || "",
-        mobile: "+91-" + (formData.mobile || ""),
-        email: formData.email || "",
-        message: formData.message || formData.note || "",
-        source: formData.source || "",
-        date: new Date().toISOString().split("T")[0],
-        time: new Date().toTimeString().substr(0,8)
-  };
-}
-
 function getParam(key) {
     return new URLSearchParams(window.location.search).get(key) || "";
 }
 
-function pushToSellDo(formData) {
+function submitToSellDo(formData) {
     var phoneValue = formData.mobile || "";
     var phoneWithCode = phoneValue.startsWith("+") ? phoneValue : "+91" + phoneValue;
     var message = formData.message || formData.note || "";
@@ -2185,7 +2171,7 @@ function pushToSellDo(formData) {
                     email: formData.email || "",
                 },
             },
-        },
+        }
     };
 
     return fetch("/api/selldo-proxy", {
@@ -2193,17 +2179,17 @@ function pushToSellDo(formData) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sellDoPayload),
     }).then(function(res) {
-        return res.text().then(function(text) {
+        return res.json().then(function(data) {
             if (!res.ok) {
-                throw new Error("Sell.do error " + res.status + ": " + text);
+                throw new Error("API error " + res.status + ": " + (data.error || JSON.stringify(data)));
             }
-            try { return JSON.parse(text); } catch (e) { return text; }
+            return data;
         });
     });
 }
 
 // Main form submission handler
-function submitToCratio(formElem, event) {
+function submitForm(formElem, event) {
   event.preventDefault();
 
   var $form = $(formElem);
@@ -2226,14 +2212,32 @@ function submitToCratio(formElem, event) {
   showLoader();
   $form.find('button[type="submit"]').prop('disabled', true);
 
-    // Prepare final payload for the API
-    var payload = buildPayload(formData);
-
-    pushToSellDo(formData).then(function() {
+    // Submit directly to sell.do API
+    submitToSellDo(formData).then(function(response) {
+        console.log("Form submitted successfully:", response);
         hideLoader();
-        window.location.href = "thank-you.html";
+        
+        // Hide the form modal if it's open
+        if ($('#modal-form').hasClass('show')) {
+            $('#modal-form').modal('hide');
+        }
+        
+        // Change URL for tracking without page reload
+        if (window.history && window.history.pushState) {
+            window.history.pushState({}, 'Thank You', 'thank-you.html');
+        }
+        
+        // Show thank you modal
+        $('#thankyouModal').modal('show');
+        
+        // Reset form after showing success message
+        setTimeout(function() {
+            $form[0].reset();
+            $form.find('button[type="submit"]').prop('disabled', false);
+        }, 500);
+        
     }).catch(function(err) {
-        console.error(err);
+        console.error("Form submission error:", err);
         hideLoader();
         $form.find('button[type="submit"]').prop('disabled', false);
         alert("There was a problem submitting the form. Please try again.");
@@ -2245,10 +2249,17 @@ function submitToCratio(formElem, event) {
 // Attach to forms on ready
 $(document).ready(function(){
   $('#contact-form').submit(function(e){
-    submitToCratio(this, e);
+    submitForm(this, e);
   });
   $('#main-form').submit(function(e){
-    submitToCratio(this, e);
+    submitForm(this, e);
+  });
+  
+  // Restore original URL when thank you modal is closed
+  $('#thankyouModal').on('hidden.bs.modal', function() {
+    if (window.history && window.history.pushState) {
+      window.history.pushState({}, '', '/');
+    }
   });
 });
 </script>
