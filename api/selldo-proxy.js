@@ -9,6 +9,9 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {};
+    
+    // Use API key from request body if provided, otherwise use default
+    const apiKey = body.api_key || SELLDO_API_KEY;
 
     // If caller already sent the full sell_do structure, just append API key.
     // Otherwise, build the expected structure from flat fields.
@@ -16,7 +19,7 @@ export default async function handler(req, res) {
     if (body.sell_do) {
       payload = {
         ...body,
-        api_key: SELLDO_API_KEY,
+        api_key: apiKey,
       };
       const lead = body.sell_do?.form?.lead || {};
       if (!lead.name || !lead.phone || !lead.email) {
@@ -44,6 +47,7 @@ export default async function handler(req, res) {
       }
 
       payload = {
+        api_key: apiKey,
         sell_do: {
           analytics: {
             utm_content,
@@ -59,7 +63,6 @@ export default async function handler(req, res) {
             note: { content: message },
           },
         },
-        api_key: SELLDO_API_KEY,
       };
     }
 
