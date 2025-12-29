@@ -1,5 +1,5 @@
 const SELLDO_ENDPOINT = "https://app.sell.do/api/leads/create.json";
-const SELLDO_API_KEY = "763df41feda17d2d393a0cc4dd367ba9";
+const SELLDO_API_KEY = "e671547fdcfa16ba3f4dc662863b07e2";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
