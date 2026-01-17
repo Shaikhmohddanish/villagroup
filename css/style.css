@@ -2208,7 +2208,38 @@ input {
   }
 
   .my_cust_tab li {
-    margin: 6px 10px;
+    margin: 0;
+  }
+
+  .my_cust_tab {
+    justify-content: center;
+    gap: 12px;
+  }
+
+  #gal .my_cust_tab {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+  }
+
+  #gal .my_cust_tab li {
+    flex: 0 0 auto;
+  }
+
+  #gal .my_cust_tab li .nav-link {
+    padding: 10px 18px;
+    font-size: 15px;
+  }
+
+  #gal .gallery-carousel .item {
+    display: flex;
+    justify-content: center;
+  }
+
+  #gal .gallery-carousel .pro_gallery {
+    width: 100%;
+    max-width: 360px;
   }
 
   .ame_wrap .ame_icon {
@@ -2792,19 +2823,13 @@ marquee {
 
 .gallery-carousel .owl-item>div {
   cursor: pointer;
-  margin: 2% 3% 2% 3%;
-  transform: scale(0.9);
-  transition: all 0.4s ease;
+  margin: 0;
+  transform: none;
+  transition: all 0.25s ease;
 }
 
-.gallery-carousel .owl-item.center>div {
-  cursor: auto;
-  margin: 2%;
-  transform: scale(1.2);
-}
-
-.gallery-carousel .owl-item:not(.center)>div:hover {
-  opacity: .75;
+.gallery-carousel .owl-item>div:hover {
+  opacity: .9;
 }
 
 
@@ -2929,7 +2954,6 @@ marquee {
   .dwnButton {
     position: fixed;
     bottom: 50%;
-    /* top: 281px; */
     right: -66px;
     width: 161px;
     left: auto;

@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.css"
         integrity="sha512-UTNP5BXLIptsaj5WdKFrkFov94lDx+eBvbKyoe1YAfjeRPC+gT5kyZ10kOHCfNZqEui1sxmqvodNUx3KbuYI/A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/style.css?v=20260117" rel="stylesheet">
     <link href="css/plugin.min.css" rel="stylesheet">
     <link href="fonts/flaticons/flaticon.css" rel="stylesheet">
     <link href="fonts/flaticons/FuturaBQ-DemiBold.otf" rel="stylesheet">
@@ -1959,7 +1959,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             nav: true,
             navText: ["<img src='images/next.svg'>", "<img src='images/next.svg'>"],
             dots: false,
-            center: true,
+            center: false,
             responsive: {
                 0: {
                     items: 1
@@ -2095,12 +2095,12 @@ document.querySelectorAll('.owl-menu').forEach(function(link) {
 <script>
 (function() {
     // Auto-popup behavior:
-    // - first visit: show after 20s from page load
+    // - first visit: show after 1s from page load
     // - if user closes without submitting: show again after 20s from that close
     // - if user submits: stop all future auto popups
 
-    var initialDelayMs = 20000;
-    var repeatDelayMs = 20000;
+    var initialDelayMs = 1000; // open after 1 second on first page load
+    var repeatDelayMs = 12000;
     var popupTimerId = null;
     var hasSubmitted = false;
 
