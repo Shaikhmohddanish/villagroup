@@ -1,0 +1,17 @@
+# robots.txt for Villa Group Real Estate
+# https://villagroup.co.in
+
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Optional: Disallow crawling of assets for efficiency (uncomment if needed)
+# Disallow: /css/
+# Disallow: /js/
+# Disallow: /fonts/
+
+# Sitemap location
+Sitemap: https://villagroup.co.in/sitemap.xml
