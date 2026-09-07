@@ -2619,6 +2619,60 @@ button.btn.btn-danger.download1:hover, button.btn.btn-danger.download1:focus {
   vertical-align: bottom;
 }
 
+.pricingTable .config-price-list {
+  list-style: none;
+  margin: 18px auto 0;
+  padding: 14px 22px 4px;
+  max-width: 260px;
+  text-align: left;
+  border-top: 1px solid rgba(212, 175, 55, 0.45);
+}
+
+.pricingTable .config-price-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.pricingTable .config-price-list li span {
+  color: #444;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.pricingTable .config-price-list li strong {
+  color: #000;
+  font-size: 19px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 991px) {
+  .pricingTable .config-price-list {
+    max-width: 300px;
+  }
+}
+
+/* Only some projects publish prices, so cards differ in height. Stretch them to
+   match within a row so every gold CTA bar lines up. */
+#conf .row > [class*="col-"] {
+  display: flex;
+}
+
+#conf .pricingTable {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#conf .pricingTable .pricingTable-header {
+  flex: 1 1 auto;
+}
+
 .pricingTable .pricing-content {
   /* border-radius: 0 0 20px 20px; */
   padding: 23px 30px;

@@ -259,8 +259,10 @@
           novalidnumber: true,
           fivenumber: true,
         },
+        // Email is optional on the popup: LeadRat accepts leads without one,
+        // and the markup does not mark this field required.
         email: {
-          required: true,
+          required: false,
           email: true,
         },
       },
@@ -272,42 +274,7 @@
           required: "Enter Your Valid Number",
         },
         email: {
-          required: "Enter Your Valid Email",
-        },
-      },
-    });
-  }
-
-  var contact_form = $("#contact-form");
-  if (contact_form.length > 0) {
-    contact_form.validate({
-      rules: {
-        fname: {
-          required: true,
-          maxlength: 100,
-        },
-        mobile: {
-          required: true,
-          number: true,
-          minlength: 10,
-          maxlength: 10,
-          novalidnumber: true,
-          fivenumber: true,
-        },
-        email: {
-          required: true,
-          email: true,
-        },
-      },
-      messages: {
-        fname: {
-          required: "Enter Your Name",
-        },
-        mobile: {
-          required: "Enter Your Valid Number",
-        },
-        email: {
-          required: "Enter Your Valid Email",
+          email: "Enter Your Valid Email",
         },
       },
     });
