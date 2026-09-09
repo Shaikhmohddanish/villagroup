@@ -138,7 +138,7 @@ export default async function handler(req, res) {
 
     const { submittedDate, submittedTime } = istStamp();
 
-    const payload = {
+    const lead = {
       name,
       state: DEFAULT_STATE,
       city: DEFAULT_CITY,
@@ -175,7 +175,10 @@ export default async function handler(req, res) {
           "API-Key": LEADRAT_API_KEY,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        // The endpoint deserializes a List<WebsiteIntegrationDto>, so the lead
+        // must be wrapped in an array. Sending a bare object (as the shared
+        // curl sample does) fails with "The JSON value could not be converted".
+        body: JSON.stringify([lead]),
         signal: controller.signal,
       });
     } catch (err) {
